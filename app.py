@@ -8,7 +8,7 @@ def authenticate_google_sheets():
     try:
         # Define the scope and authenticate using the credentials JSON file
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)  # Ensure credentials.json is uploaded
         client = gspread.authorize(creds)
         return client
     except Exception as e:
@@ -63,7 +63,7 @@ for i in range(5):
 # Dynamically add more input fields based on user input
 more_spam = True
 while more_spam:
-    if len(spam_amounts) < 15:
+    if len(spam_amounts) < 15:  # Limit the number of fields to 15
         more_spam = st.button(f"Add More Spam Amounts")
         if more_spam:
             spam_amounts.extend([st.number_input(f"Enter Spam Amount {len(spam_amounts)+1}", min_value=0, step=1) for _ in range(5)])
