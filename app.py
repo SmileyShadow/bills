@@ -102,3 +102,4 @@ if filtered_data:
     st.write(f"**Daily Total**: {filtered_data[0]['Daily Total']}")
 else:
     st.write("No data found for this day.")
+
