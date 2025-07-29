@@ -5,16 +5,42 @@ from datetime import datetime
 
 # Authenticate Google Sheets API
 def authenticate_google_sheets():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name('path/to/your/credentials.json', scope)
-    client = gspread.authorize(creds)
-    return client
+    try:
+        # Define the scope and authenticate using the credentials JSON file
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+        client = gspread.authorize(creds)
+        return client
+    except Exception as e:
+        st.error(f"Authentication failed: {e}")
+        return None
+
+# Function to get data from Google Sheets
+def get_sheet_data():
+    client = authenticate_google_sheets()
+    if client:
+        try:
+            # Open the Google Sheet (make sure it's named correctly)
+            sheet = client.open("Bill Tracker").sheet1  # Change if the name is different
+            data = sheet.get_all_records()  # Get all rows of data
+            return data
+        except Exception as e:
+            st.error(f"Error fetching data from Google Sheets: {e}")
+            return []
+    else:
+        return []
 
 # Function to update Google Sheet with new data
 def update_sheet(date, cash, spam_amounts, total_spam, daily_total):
     client = authenticate_google_sheets()
-    sheet = client.open("Bill Tracker").sheet1
-    sheet.append_row([date, cash, ', '.join(map(str, spam_amounts)), total_spam, daily_total])
+    if client:
+        try:
+            sheet = client.open("Bill Tracker").sheet1  # Open the first sheet
+            sheet.append_row([date, cash, ', '.join(map(str, spam_amounts)), total_spam, daily_total])
+        except Exception as e:
+            st.error(f"Error saving data to Google Sheets: {e}")
+    else:
+        st.error("Could not authenticate with Google Sheets.")
 
 # Streamlit UI Setup
 st.title("Bill Tracker")
