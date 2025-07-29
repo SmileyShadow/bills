@@ -10,13 +10,6 @@ def authenticate_google_sheets():
     client = gspread.authorize(creds)
     return client
 
-# Function to get data from Google Sheets
-def get_sheet_data():
-    client = authenticate_google_sheets()
-    sheet = client.open("Bill Tracker").sheet1
-    data = sheet.get_all_records()
-    return data
-
 # Function to update Google Sheet with new data
 def update_sheet(date, cash, spam_amounts, total_spam, daily_total):
     client = authenticate_google_sheets()
@@ -36,27 +29,20 @@ date = st.date_input("Select Date", datetime.today())
 # Cash input
 cash = st.number_input("Enter Total Cash", min_value=0, step=1)
 
-# Dynamic Spam Amount Inputs: 5 fields initially
-spam_input_1 = st.number_input("Enter Spam Amount 1", min_value=0, step=1)
-spam_input_2 = st.number_input("Enter Spam Amount 2", min_value=0, step=1)
-spam_input_3 = st.number_input("Enter Spam Amount 3", min_value=0, step=1)
-spam_input_4 = st.number_input("Enter Spam Amount 4", min_value=0, step=1)
-spam_input_5 = st.number_input("Enter Spam Amount 5", min_value=0, step=1)
+# Dynamic Spam Amount Inputs (5 fields initially)
+spam_amounts = []
+for i in range(5):
+    spam_amounts.append(st.number_input(f"Enter Spam Amount {i+1}", min_value=0, step=1))
 
-# Display more spam fields if needed:
-if st.button('Add More Spam Amounts'):
-    spam_input_6 = st.number_input("Enter Spam Amount 6", min_value=0, step=1)
-    spam_input_7 = st.number_input("Enter Spam Amount 7", min_value=0, step=1)
-    spam_input_8 = st.number_input("Enter Spam Amount 8", min_value=0, step=1)
-    spam_input_9 = st.number_input("Enter Spam Amount 9", min_value=0, step=1)
-    spam_input_10 = st.number_input("Enter Spam Amount 10", min_value=0, step=1)
-else:
-    spam_input_6 = spam_input_7 = spam_input_8 = spam_input_9 = spam_input_10 = None
-
-# Collect all spam inputs
-spam_amounts = [spam_input_1, spam_input_2, spam_input_3, spam_input_4, spam_input_5]
-if spam_input_6 is not None:
-    spam_amounts.extend([spam_input_6, spam_input_7, spam_input_8, spam_input_9, spam_input_10])
+# Dynamically add more input fields based on user input
+more_spam = True
+while more_spam:
+    if len(spam_amounts) < 15:
+        more_spam = st.button(f"Add More Spam Amounts")
+        if more_spam:
+            spam_amounts.extend([st.number_input(f"Enter Spam Amount {len(spam_amounts)+1}", min_value=0, step=1) for _ in range(5)])
+    else:
+        more_spam = False
 
 # Calculate total spam
 total_spam = sum(spam_amounts)
